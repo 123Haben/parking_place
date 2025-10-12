@@ -1,47 +1,49 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
 </script>
 
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
+  <div class="app-container">
+    <div class="dashboard">
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <div class="sidebar-header">
+          <h1>Dashboard</h1>
+          <p>Analytics & Monitoring</p>
+        </div>
+        <nav class="sidebar-nav">
+          <RouterLink to="/dashboard"><i class="fas fa-home"></i> Dashboard</RouterLink>
+          <RouterLink to="/analytics"><i class="fas fa-chart-line"></i> Analytics</RouterLink>
+          <RouterLink to="/gate"><i class="fas fa-users"></i> Gate</RouterLink>
+          <RouterLink to="/settings"><i class="fas fa-cog"></i> Einstellungen</RouterLink>
+        </nav>
+      </div>
 
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
+      <!-- Main Content -->
+      <div class="main-content">
+        <header class="header">
+          <div class="search-container">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Suchen..." />
+          </div>
+          <div class="header-actions">
+            <button class="notification-btn">
+              <i class="fas fa-bell"></i>
+              <span class="notification-badge">3</span>
+            </button>
+            <div class="user-info">
+              <div class="user-avatar">U</div>
+              <span class="user-name">Gruppe 19</span>
+            </div>
+          </div>
+        </header>
+
+        <main class="dashboard-content">
+          <RouterView />
+        </main>
+      </div>
     </div>
-  </header>
-
-  <main>
-    <TheWelcome />
-  </main>
+  </div>
 </template>
 
 <style scoped>
-header {
-  line-height: 1.5;
-}
-
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-}
 </style>

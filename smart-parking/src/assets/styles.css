@@ -1,0 +1,164 @@
+:root {
+    --free-color: #10b981;
+    --reserved-color: #f59e0b;
+    --occupied-color: #ef4444;
+    --text-color: #1f2937;
+    --border-color: #e5e7eb;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+    padding: 20px;
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 1800px;
+    margin: 0 auto;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.header h1 {
+    font-size: 2.5rem;
+    color: var(--text-color);
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+.header p {
+    color: #6b7280;
+    font-size: 1.1rem;
+}
+
+.parking-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 25px;
+    margin-top: 20px;
+}
+
+.parking-spot {
+    background: white;
+    border-radius: 16px;
+    padding: 25px;
+    text-align: center;
+    box-shadow: 0 8px 20px var(--shadow-color);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.parking-spot:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 25px var(--shadow-color);
+}
+
+.parking-spot::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--status-color);
+}
+
+.spot-number {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+    color: var(--text-color);
+}
+
+.spot-name {
+    font-size: 1.3rem;
+    color: #4b5563;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+.status-indicator {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 20px;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: white;
+    background: var(--status-color);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.parking-icon {
+    font-size: 2.5rem;
+    margin: 15px 0;
+    opacity: 0.7;
+}
+
+/* Status-specific styles */
+.free::before {
+    --status-color: var(--free-color);
+}
+
+.free .status-indicator {
+    background: var(--free-color);
+}
+
+.reserved::before {
+    --status-color: var(--reserved-color);
+}
+
+.reserved .status-indicator {
+    background: var(--reserved-color);
+}
+
+.occupied::before {
+    --status-color: var(--occupied-color);
+}
+
+.occupied .status-indicator {
+    background: var(--occupied-color);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .parking-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+    }
+
+    .header h1 {
+        font-size: 2rem;
+    }
+
+    .spot-number {
+        font-size: 1.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .parking-grid {
+        grid-template-columns: 1fr;
+    }
+
+    body {
+        padding: 15px;
+    }
+
+    .parking-spot {
+        padding: 20px;
+    }
+}
