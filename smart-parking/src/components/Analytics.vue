@@ -23,6 +23,7 @@ const selectedView = ref('day') // Tag / Woche / Monat
 const gateLogs = ref([])        // Echte API-Daten
 const loading = ref(false)
 const error = ref(null)
+const API_URL = "http://77.47.120.198:8000";
 
 // -------------------------
 // API-Aufruf: /gates
@@ -31,7 +32,7 @@ async function loadGateData() {
   loading.value = true
   error.value = null
   try {
-    const res = await axios.get('http://77.47.120.198:8000/gates')
+    const res = await axios.get(API_URL+'/gates')
     gateLogs.value = res.data
   } catch (err) {
     console.error(err)

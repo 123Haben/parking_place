@@ -122,6 +122,9 @@ thead {
     background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     color: white;
 }
+thead th {
+    color: white;
+}
 
 th {
     padding: 16px 20px;

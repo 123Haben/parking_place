@@ -9,6 +9,7 @@ const gates = ref([])
 const owners = ref([]) // Neue Tabelle mit registrierten RFID-Tags
 const loading = ref(false)
 const error = ref(null)
+const Rest_Api = 'http://77.47.120.198:8000'
 
 // Formularfelder
 const newOwner = ref({
@@ -22,7 +23,7 @@ const newOwner = ref({
 async function loadGates() {
   loading.value = true
   try {
-    const res = await axios.get('http://77.47.120.198:8000/gates')
+    const res = await axios.get(Rest_Api+'/gates')
     gates.value = res.data
   } catch (err) {
     error.value = 'Fehler beim Laden der Gate-Daten'
@@ -34,7 +35,7 @@ async function loadGates() {
 // RFID-Registrierung abrufen
 async function loadOwners() {
   try {
-    const res = await axios.get('http://77.47.120.198:8000/owners/')
+    const res = await axios.get('Rest_Api+/owners/')
     owners.value = res.data
   } catch (err) {
     console.warn('⚠️ Konnte Besitzer nicht laden:', err)
@@ -49,15 +50,18 @@ async function registerOwner() {
   }
 
   try {
-    const res = await axios.post('http://77.47.120.198:8000/owners/', {
+    const res = await axios.post(Rest_Api+'/owners/', {
+      id: 0,
       rf_id_tag: newOwner.value.rf_id_tag,
       owner_name: newOwner.value.owner_name,
     })
+
     alert('✅ RFID-Tag erfolgreich registriert!')
-    owners.value.push(res.data) // zur Tabelle hinzufügen
-    newOwner.value = { rf_id_tag: '', owner_name: '', contact: '', vehicle_name: '' } // Reset
+    owners.value.push(res.data)
+    newOwner.value = { rf_id_tag: '', owner_name: '', contact: '', vehicle_name: '' }
   } catch (err) {
-    alert('❌ Fehler bei der Registrierung: ' + err.message)
+    console.error(err.response?.data)
+    alert('❌ Fehler bei der Registrierung: ' + JSON.stringify(err.response?.data || err.message))
   }
 }
 
@@ -96,7 +100,6 @@ onMounted(() => {
       <p>Übersicht aller Fahrzeuge und Parkplatznutzung</p>
     </div>
 
-    <!-- Tab Navigation -->
     <div class="tabs">
       <button
           class="tab-button"
@@ -121,11 +124,9 @@ onMounted(() => {
       </button>
     </div>
 
-    <!-- Ladezustand -->
     <div v-if="loading" class="text-center pa-4">⏳ Daten werden geladen...</div>
     <div v-else-if="error" class="text-error pa-4">{{ error }}</div>
 
-    <!-- Aktuelle Fahrzeuge -->
 
     <div v-else-if="activeTab === 'current'" class="tab-content active">
       <div class="table-container">
@@ -153,7 +154,6 @@ onMounted(() => {
       </div>
     </div>
 
-    <!-- Historie -->
     <div v-else-if="activeTab === 'history'" class="tab-content active">
     <div class="table-container">
         <table>
@@ -182,7 +182,6 @@ onMounted(() => {
       </div>
     </div>
 
-    <!-- register -->
     <div v-else-if="activeTab === 'register'" class="tab-content active">
       <div class="registration-form">
         <h2 class="form-title">Neues RFID-Tag registrieren</h2>

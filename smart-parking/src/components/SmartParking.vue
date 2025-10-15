@@ -49,12 +49,12 @@
 import axios from "axios"
 import { ref, onMounted } from "vue"
 
-const API_URL = "http://77.47.120.198:8000/parking_places"
+const API_URL = "http://77.47.120.198:8000"
 const parkingSpots = ref([])
 
 async function loadParkingData() {
   try {
-    const response = await axios.get(API_URL)
+    const response = await axios.get(API_URL+'/parking_places')
     parkingSpots.value = response.data
   } catch (err) {
     console.warn("⚠️ API nicht erreichbar:", err.message)
@@ -75,60 +75,57 @@ async function reserveSpot(parkingId) {
   if (!rfId) return;
 
   try {
-    // 1️⃣ RFID -> Besitzer-ID abfragen
-    const ownerRes = await axios.get(`http://77.47.120.198:8000/owners/by_rfid/${rfId}`);
+    // 1 Besitzer über RFID suchen
+    const ownerRes = await axios.get(API_URL+`/owners/by_rfid/${rfId}`);
     const ownerId = ownerRes.data.id;
 
     if (!ownerId) {
-      alert("RFID nicht registriert!");
+      alert("❌ RFID nicht registriert!");
       return;
     }
 
-    // 2️⃣ Besitzer zuweisen (korrektes PUT)
-    await axios.put(
-        `http://77.47.120.198:8000/parking_places/${parkingId}/owner?owner_id=${ownerId}`,
-        null,
-        { headers: { "Content-Type": "application/json" } }
+    // ⃣ Prüfen, ob dieser Owner schon reserviert hat
+    const parkingRes = await axios.get(API_URL+"/parking_places");
+    const alreadyReserved = parkingRes.data.some(
+        p => p.owner_id === ownerId && p.status === "RESERVED"
     );
 
-    // 3️⃣ Status auf RESERVED setzen
-    await axios.put(
-        `http://77.47.120.198:8000/parking_places/${parkingId}`,
-        { status: "RESERVED" },
-        { headers: { "Content-Type": "application/json" } }
+    if (alreadyReserved) {
+      alert("⚠️ Du hast bereits einen Parkplatz reserviert!");
+      return;
+    }
+
+    // ⃣Parkplatz reservieren
+    const res = await axios.put(
+        API_URL+`/parking_places/${parkingId}?status=RESERVED&owner_id=${ownerId}`
     );
 
-    alert("✅ Parkplatz erfolgreich reserviert!");
+    alert(`✅ Parkplatz ${res.data.place_name} erfolgreich reserviert!`);
     await loadParkingData();
+
   } catch (err) {
-    console.error(err);
-    alert("❌ Fehler bei der Reservierung: " + err.message);
+    console.error("Fehler bei der Reservierung:", err.response?.data || err.message);
+    alert("❌ Fehler bei der Reservierung: " + JSON.stringify(err.response?.data || err.message));
   }
 }
+
 
 async function freeSpot(parkingId) {
   try {
-    // 1️⃣ Besitzer entfernen
-    await axios.put(
-        `http://77.47.120.198:8000/parking_places/${parkingId}/owner?owner_id=`,
-        null,
-        { headers: { "Content-Type": "application/json" } }
-    );
+    //  Besitzer löschen (ohne owner_id=null!)
+    await axios.put(API_URL+`/parking_places/${parkingId}/owner`);
 
-    // 2️⃣ Status auf FREE setzen
-    await axios.put(
-        `http://77.47.120.198:8000/parking_places/${parkingId}`,
-        { status: "FREE" },
-        { headers: { "Content-Type": "application/json" } }
-    );
+    // ⃣ Status auf FREE setzen
+    await axios.put(API_URL+`/parking_places/${parkingId}?status=FREE`);
 
-    alert("✅ Parkplatz freigegeben!");
+    alert("✅ Parkplatz erfolgreich freigegeben!");
     await loadParkingData();
   } catch (err) {
-    console.error(err);
-    alert("❌ Fehler beim Freigeben: " + err.message);
+    console.error("Fehler beim Freigeben:", err.response?.data || err.message);
+    alert("❌ Fehler beim Freigeben: " + JSON.stringify(err.response?.data || err.message));
   }
 }
+
 
 
 onMounted(() => {
